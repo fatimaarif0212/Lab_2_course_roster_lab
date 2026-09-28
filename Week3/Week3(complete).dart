@@ -306,62 +306,8 @@ With await: Execution pauses at that line until the Future completes,
 Without await: The expression executes immediately to the Future before it finishes executing, .*/
 
 
-// BONUS TASKS
-// Task B1
-Map<String, List<String>> groupTitlesByTag() {
-  final Map<String, List<String>> tagMap = {};
-  for (var book in books) {
-    final title = book['title'] as String;
-    final tags = book['tags'] as List<String>;
-    for (var tag in tags) {
-      tagMap.putIfAbsent(tag, () => []).add(title);
-    }
-  }
-  return tagMap;
-}
 
-// Task B2
-List<T> filterBy<T>(List<T> items, bool Function(T) test) {
-  final result = <T>[];
-  for (var item in items) {
-    if (test(item)) {
-      result.add(item);
-    }
-  }
-  return result;
-}
 
-// Task B3
-Future<void> runConcurrentTasks() async {
-  final stopwatch = Stopwatch()..start();
 
-  final results = await Future.wait([
-    fetchBookOfTheDay(),
-    fetchBookOfTheDay(),
-  ]);
 
-  stopwatch.stop();
-  print('Results: $results');
-  print('Total time taken: ${stopwatch.elapsedMilliseconds} ms (${stopwatch.elapsed.inSeconds} seconds)');
-}
 
-// calling
-Future<void> bonus() async {
-  print('--- Bonus Tasks ---');
-
-  // B1 Demonstration
-  print('Titles grouped by tag:');
-  print(groupTitlesByTag());
-
-  // B2 Demonstration
-  final availableBooks = filterBy<Map<String, dynamic>>(
-    books,
-    (b) => (b['copies'] as int) > 0,
-  );
-  final availableTitles = availableBooks.map((b) => b['title'] as String).toList();
-  print('Available books (using filterBy): $availableTitles');
-
-  // B3 Demonstration
-  print('Running concurrent fetch calls...');
-  await runConcurrentTasks();
-}
