@@ -304,7 +304,7 @@ Future<void> part6() async {
 With await: Execution pauses at that line until the Future completes, 
 
 Without await: The expression executes immediately to the Future before it finishes executing, .*/
-  REFLECTION ANSWERS
+/*  REFLECTION ANSWERS
 1. When to use fold over reduce:
 Use fold when the list might be empty, because reduce crashes on empty lists.  Also use fold when you want an answer that is a different type than the items in the list.
 
