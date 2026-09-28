@@ -215,3 +215,153 @@ void part4() {
 }
 void part5() { print('--- Part 5 ---'); }
 Future<void> part6() async { print('--- Part 6 ---'); }
+// Task 5.1: Custom Exceptions
+class BookNotFoundException implements Exception {
+  final String title;
+  BookNotFoundException(this.title);
+}
+
+class BookNotAvailableException implements Exception {
+  final String title;
+  BookNotAvailableException(this.title);
+}
+
+// Task 5.2: Throwing 
+void checkOut(Map<String, int> stock, String title) {
+  if (!stock.containsKey(title)) {
+    throw BookNotFoundException(title);
+  }
+  if (stock[title]! <= 0) {
+    throw BookNotAvailableException(title);
+  }
+  stock[title] = stock[title]! - 1;
+}
+
+// Task 5.4: built-in exception
+Map<String, dynamic> findBook(String title) {
+  return books.firstWhere((b) => b['title'] == title);
+}
+// --- calling
+void part5() {
+  print('--- Part 5 ---');
+
+  // Task 5.3: try / on / catch / finally
+  var stock = buildStock();
+  var testTitles = ['Dart in Action', 'Flutter Basics', 'Unknown Book'];
+
+  for (var title in testTitles) {
+    try {
+      checkOut(stock, title);
+      print('Checked out: $title');
+    } on BookNotAvailableException catch (e) {
+      print('Sorry: "${e.title}" has no copies left');
+    } on BookNotFoundException catch (e) {
+      print('Not found: "${e.title}"');
+    } finally {
+      print('Transaction logged.');
+    }
+  }
+
+  print('Copies left of Dart in Action: ${stock['Dart in Action']}');
+
+  // Task 5.4: (continued)
+  try {
+    findBook('Missing');
+  } on StateError {
+    print('Search failed: no such book');
+  }
+}
+// Task 6.1: Await a future
+Future<String> fetchBookOfTheDay() async {
+  await Future.delayed(const Duration(seconds: 1));
+  return 'Dart in Action';
+}
+
+// Task 6.3: errors in async code
+Future<String> fetchBroken() async {
+  await Future.delayed(const Duration(milliseconds: 500));
+  throw Exception('Server down');
+}
+
+// calling
+
+Future<void> part6() async {
+  print('--- Part 6 ---');
+  print('Fetching...');
+
+  // Task 6.1: Await the Future 
+  final book = await fetchBookOfTheDay();
+  print('Book of the day: $book');
+
+  // Task 6.3:  Errors in async code 
+  try {
+    await fetchBroken();
+  } catch (e) {
+    print('Fetch failed: $e');
+  }
+}
+/* 6.2 
+With await: Execution pauses at that line until the Future completes, 
+
+Without await: The expression executes immediately to the Future before it finishes executing, .*/
+
+
+// BONUS TASKS
+// Task B1
+Map<String, List<String>> groupTitlesByTag() {
+  final Map<String, List<String>> tagMap = {};
+  for (var book in books) {
+    final title = book['title'] as String;
+    final tags = book['tags'] as List<String>;
+    for (var tag in tags) {
+      tagMap.putIfAbsent(tag, () => []).add(title);
+    }
+  }
+  return tagMap;
+}
+
+// Task B2
+List<T> filterBy<T>(List<T> items, bool Function(T) test) {
+  final result = <T>[];
+  for (var item in items) {
+    if (test(item)) {
+      result.add(item);
+    }
+  }
+  return result;
+}
+
+// Task B3
+Future<void> runConcurrentTasks() async {
+  final stopwatch = Stopwatch()..start();
+
+  final results = await Future.wait([
+    fetchBookOfTheDay(),
+    fetchBookOfTheDay(),
+  ]);
+
+  stopwatch.stop();
+  print('Results: $results');
+  print('Total time taken: ${stopwatch.elapsedMilliseconds} ms (${stopwatch.elapsed.inSeconds} seconds)');
+}
+
+// calling
+Future<void> bonus() async {
+  print('--- Bonus Tasks ---');
+
+  // B1 Demonstration
+  print('Titles grouped by tag:');
+  print(groupTitlesByTag());
+
+  // B2 Demonstration
+  final availableBooks = filterBy<Map<String, dynamic>>(
+    books,
+    (b) => (b['copies'] as int) > 0,
+  );
+  final availableTitles = availableBooks.map((b) => b['title'] as String).toList();
+  print('Available books (using filterBy): $availableTitles');
+
+  // B3 Demonstration
+  print('Running concurrent fetch calls...');
+  await runConcurrentTasks();
+}
