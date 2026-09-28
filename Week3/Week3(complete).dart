@@ -304,10 +304,15 @@ Future<void> part6() async {
 With await: Execution pauses at that line until the Future completes, 
 
 Without await: The expression executes immediately to the Future before it finishes executing, .*/
+  REFLECTION ANSWERS
+1. When to use fold over reduce:
+Use fold when the list might be empty, because reduce crashes on empty lists.  Also use fold when you want an answer that is a different type than the items in the list.
 
+2. What capturing a variable means:
+It means an inner function remembers avariable from outside, even after the main function finishes running. In makeCounter, the variable 'count' was captured.
 
+3. Why specific exception comes first:
+Dart checks error handlers from top to bottom. A general catch (e) catches  all errors, so any specific error block placed after it will never run.
 
-
-
-
-
+4. Why forgetting await still compiles: Without await, Dart gives you the receipt box (Future) right away instead of waiting for the real value inside. The code is valid Dart, but you get the box instead of the answer.
+*/
